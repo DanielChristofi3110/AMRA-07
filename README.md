@@ -1,2 +1,2 @@
 ![ROBOT](images/robot.jpg)
-![BP1](images/bp1.jpg)
+![BP1](images/bp1.png)
