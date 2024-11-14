@@ -7,7 +7,7 @@
 */
 
 #include <Wire.h>
-#include <MPU6050.h>
+#include "MPU6050.h"
 #include "DualL298N.h"
 
 DualL298N motorDriver(2, 3, 9, 5, 4, 10); 
@@ -34,7 +34,7 @@ void setup()
     delay(500);
   }
 
-   //delay(60000);
+   delay(20000);
   
   // Calibrate gyroscope. The calibration must be at rest.
   // If you don't want calibrate, comment this line.
@@ -68,16 +68,19 @@ void loop()
    //Serial.print(" Yaw = ");
  //motorDriver.setSpeedBoth(-95,95,0);
  int acc=5;
- if((yaw>=-90+acc)){
+ if(yaw>=-90+acc){
  motorDriver.setSpeedBoth(-95,95,0);
+ Serial.println("Left");
 
-}else if((yaw<=-90-acc)){
+}else if(yaw<=-90-acc){
  motorDriver.setSpeedBoth(95,-95,0);
-
+Serial.println("Right");
  
  }else{
 
-  motorDriver.stopAll();
+  motorDriver.setSpeedBoth(100,95,0);
+  //motorDriver.stopAll();
+  Serial.println("frw");
    //mpu.calibrateGyro();
 
  }
