@@ -1,15 +1,12 @@
 #include "TimerOne.h"
+#include "DualL298N.h"
 
 unsigned int counter1 = 0; // Counter for motor 1
 unsigned int counter2 = 0; // Counter for motor 2
 
-// Motor 1 pins (L9110)
-int b1a = 8;  
-int b1b = 9;
+DualL298N motorDriver(8, 4, 9, 7, 5, 10); 
 
-// Motor 2 pins (L9110)
-int c1a = 7;  
-int c1b = 10;
+
 
 // Speed sensor pins
 int sensor1 = 2; // Interrupt pin 0 (Motor 1 sensor)
@@ -17,8 +14,10 @@ int sensor2 = 3; // Interrupt pin 1 (Motor 2 sensor)
 
 // Variables for RPM and control
 int rpm1 = 0, rpm2 = 0; // Current RPM for both motors
-int pwmMotor1 = 100; // Fixed PWM for Motor 1
-int pwmMotor2 = 255; // Adjustable PWM for Motor 2
+int pwmMotor1 = 90; // Fixed PWM for Motor 1
+int pwmMotor2 = 90; // Adjustable PWM for Motor 2
+int trg_rpm1 = 140;
+int trg_rpm2 = 110;
 
 double d1=0;
 double d2=0;
@@ -52,22 +51,36 @@ void timerIsr() {
   Serial.println(rpm2);
 
   // Simple speed matching adjustment
-  int error = rpm1 - rpm2;
+  int error1 = trg_rpm1 - rpm1;
 
-  if (error > 5) {
+  if (error1 > 5) {
     // Motor 2 is slower; increase its PWM
-    pwmMotor1 -= 3;
-  } else if (error < -5) {
+    pwmMotor1 += 1;
+  } else if (error1 < -5) {
     // Motor 2 is faster; decrease its PWM
-    pwmMotor1 += 3;
+    pwmMotor1 -= 1;
+  }
+
+
+    int error2 = trg_rpm2 - rpm2;
+
+  if (error2 > 5) {
+    // Motor 2 is slower; increase its PWM
+    pwmMotor2 += 1;
+  } else if (error2 < -5) {
+    // Motor 2 is faster; decrease its PWM
+    pwmMotor2 -= 1;
   }
 
   // Constrain PWM values to valid range (0-255)
   pwmMotor2 = constrain(pwmMotor2, 0, 255);
 
   // Display adjustment
-  Serial.print("Error: ");
-  Serial.println(error);
+  Serial.print("Error1: ");
+  Serial.println(error1);
+
+  Serial.print("Error2: ");
+  Serial.println(error2);
 
   Serial.print("PWM Motor 1: ");
   Serial.println(pwmMotor1);
@@ -89,13 +102,8 @@ void timerIsr() {
 
 void setup() {
   Serial.begin(9600);
-
-  // Motor pin modes
-  pinMode(b1a, OUTPUT);
-  pinMode(b1b, OUTPUT);
-  pinMode(c1a, OUTPUT);
-  pinMode(c1b, OUTPUT);
-
+   motorDriver.begin();    
+ 
   // Speed sensor pin modes
   pinMode(sensor1, INPUT);
   pinMode(sensor2, INPUT);
@@ -111,10 +119,15 @@ void setup() {
 
 void loop() {
   // Drive Motor 1 at constant speed
-  analogWrite(b1a, pwmMotor1); // Set PWM for Motor 1
+  /*analogWrite(b1a, pwmMotor1); // Set PWM for Motor 1
   digitalWrite(b1b, 1); // Set rotation direction (Clockwise)
+  setSpeedBoth
 
   // Drive Motor 2 with adjusted speed
   analogWrite(c1a, pwmMotor2); // Set PWM for Motor 2
-  digitalWrite(c1b, 1); // Set rotation direction (Clockwise)
+  digitalWrite(c1b, 1); // Set rotation direction (Clockwise)*/
+
+  motorDriver.setSpeedBoth(pwmMotor1,pwmMotor2,0);
+  //motorDriver.setSpeedBoth(100,100,0);
+  
 }
