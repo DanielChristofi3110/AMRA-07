@@ -1,90 +1,41 @@
-/*
-    MPU6050 Triple Axis Gyroscope & Accelerometer. Pitch & Roll & Yaw Gyroscope Example.
-    Read more: http://www.jarzebski.pl/arduino/czujniki-i-sensory/3-osiowy-zyroskop-i-akcelerometr-mpu6050.html
-    GIT: https://github.com/jarzebski/Arduino-MPU6050
-    Web: http://www.jarzebski.pl
-    (c) 2014 by Korneliusz Jarzebski
-*/
+#include "TimerOne.h"
+unsigned int counter=0;
 
-#include <Wire.h>
-#include "MPU6050.h"
-#include "DualL298N.h"
+int b1a = 6;  // L9110 B-1A 
+int b1b = 9;  // L9110 B-1B
 
-DualL298N motorDriver(2, 3, 9, 5, 4, 10); 
+void docount()  // counts from the speed sensor
+{
+  counter++;  // increase +1 the counter value
+} 
 
-MPU6050 mpu;
-
-// Timers
-unsigned long timer = 0;
-float timeStep = 0.01;
-
-// Pitch, Roll and Yaw values
-float pitch = 0;
-float roll = 0;
-float yaw = 0;
+void timerIsr()
+{
+  Timer1.detachInterrupt();  //stop the timer
+  Serial.print("Motor Speed: "); 
+  int rotation = (counter / 20);  // divide by number of holes in Disc
+  Serial.print(rotation,DEC);  
+  Serial.println(" Rotation per seconds"); 
+  counter=0;  //  reset counter to zero
+  Timer1.attachInterrupt( timerIsr );  //enable the timer
+}
 
 void setup() 
 {
-  Serial.begin(115200);
-
-  // Initialize MPU6050
-  while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
-  {
-    Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
-    delay(500);
-  }
-
-   delay(20000);
+  Serial.begin(9600);
   
-  // Calibrate gyroscope. The calibration must be at rest.
-  // If you don't want calibrate, comment this line.
-  mpu.calibrateGyro();
- 
-
-  // Set threshold sensivty. Default 3.
-  // If you don't want use threshold, comment this line or set 0.
-  // mpu.setThreshold(3);
-}
+ pinMode(b1a, OUTPUT); 
+ pinMode(b1b, OUTPUT); 
+  
+  Timer1.initialize(1000000); // set timer for 1sec
+  attachInterrupt(0, docount, RISING);  // increase counter when speed sensor pin goes High
+  Timer1.attachInterrupt( timerIsr ); // enable the timer
+} 
 
 void loop()
 {
-  timer = millis();
-
-  // Read normalized values
-  Vector norm = mpu.readNormalizeGyro();
-
-  // Calculate Pitch, Roll and Yaw
-  pitch = pitch + norm.YAxis * timeStep;
-  roll = roll + norm.XAxis * timeStep;
-  yaw = yaw + norm.ZAxis * timeStep;
-
-  // Output raw
- // Serial.print(" Pitch = ");
-  //Serial.print(pitch);
-  //Serial.print(" Roll = ");
- // Serial.print(roll);  
-  Serial.print(" Yaw = ");
-  Serial.println(yaw);
-   //Serial.print(" Yaw = ");
- //motorDriver.setSpeedBoth(-95,95,0);
- int acc=5;
- if(yaw>=-90+acc){
- motorDriver.setSpeedBoth(-95,95,0);
- Serial.println("Left");
-
-}else if(yaw<=-90-acc){
- motorDriver.setSpeedBoth(95,-95,0);
-Serial.println("Right");
- 
- }else{
-
-  motorDriver.setSpeedBoth(100,95,0);
-  //motorDriver.stopAll();
-  Serial.println("frw");
-   //mpu.calibrateGyro();
-
- }
-
-  // Wait to full timeStep period
-  delay((timeStep*1000) - (millis() - timer));
+  int potvalue = analogRead(1);  // Potentiometer connected to Pin A1
+  int motorspeed = map(potvalue, 0, 680, 255, 0);
+  analogWrite(b1a, motorspeed);  // set speed of motor (0-255)
+  digitalWrite(b1b, 1);  // set rotation of motor to Clockwise
 }
