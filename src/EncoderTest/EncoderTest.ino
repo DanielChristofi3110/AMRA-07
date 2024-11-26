@@ -4,7 +4,7 @@
 unsigned int counter1 = 0; // Counter for motor 1
 unsigned int counter2 = 0; // Counter for motor 2
 
-DualL298N motorDriver(8, 4, 9, 7, 5, 10); 
+DualL298N motorDriver(7, 6, 9, 4, 5, 10);
 
 
 
@@ -14,10 +14,10 @@ int sensor2 = 3; // Interrupt pin 1 (Motor 2 sensor)
 
 // Variables for RPM and control
 int rpm1 = 0, rpm2 = 0; // Current RPM for both motors
-int pwmMotor1 = 90; // Fixed PWM for Motor 1
-int pwmMotor2 = 90; // Adjustable PWM for Motor 2
-int trg_rpm1 = 140;
-int trg_rpm2 = 110;
+int pwmMotor1 = 50; // Fixed PWM for Motor 1
+int pwmMotor2 = 50; // Adjustable PWM for Motor 2
+int trg_rpm1 = 300;
+int trg_rpm2 = 300;
 
 double d1=0;
 double d2=0;
@@ -126,8 +126,9 @@ void loop() {
   // Drive Motor 2 with adjusted speed
   analogWrite(c1a, pwmMotor2); // Set PWM for Motor 2
   digitalWrite(c1b, 1); // Set rotation direction (Clockwise)*/
+   //analogWrite(9, 255);
 
-  motorDriver.setSpeedBoth(pwmMotor1,pwmMotor2,0);
-  //motorDriver.setSpeedBoth(100,100,0);
+  //motorDriver.setSpeedBoth(pwmMotor1,pwmMotor2,0);
+ motorDriver.setSpeedBoth(100,100,0);
   
 }

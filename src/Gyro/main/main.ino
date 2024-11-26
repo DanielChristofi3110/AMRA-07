@@ -11,7 +11,7 @@
 #include "DualL298N.h"
 #include "PID_v1.h"
 
-DualL298N motorDriver(3, 2, 9, 4, 5, 10); 
+DualL298N motorDriver(7, 6, 9, 4, 5, 10); 
 
 MPU6050 mpu;
 
@@ -90,11 +90,11 @@ void loop()
  int acc=5;
 
  if(yaw>=-90+acc){
- motorDriver.setSpeedBoth(-100,100,0);
+ motorDriver.setSpeedBoth(-95,95,0);
  Serial.println("Left");
 
 }else if(yaw<=-90-acc){
- motorDriver.setSpeedBoth(100,-100,0);
+ motorDriver.setSpeedBoth(95,-95,0);
 Serial.println("Right");
  
  }else{
