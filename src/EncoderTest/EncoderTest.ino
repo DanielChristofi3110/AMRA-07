@@ -1,134 +1,77 @@
-#include "TimerOne.h"
 #include "DualL298N.h"
-
-unsigned int counter1 = 0; // Counter for motor 1
-unsigned int counter2 = 0; // Counter for motor 2
 
 DualL298N motorDriver(7, 6, 9, 4, 5, 10);
 
+// Define pins for encoder OUT signals
+const int encoder1Pin = 2; // Interrupt pin 0
+const int encoder2Pin = 3; // Interrupt pin 1
 
+// Variables to track encoder counts
+volatile long encoder1Count = 0;
+volatile long encoder2Count = 0;
 
-// Speed sensor pins
-int sensor1 = 2; // Interrupt pin 0 (Motor 1 sensor)
-int sensor2 = 3; // Interrupt pin 1 (Motor 2 sensor)
+// Timer variables
+unsigned long lastTime = 0;
+unsigned long interval = 1000; // 1 second interval
 
-// Variables for RPM and control
-int rpm1 = 0, rpm2 = 0; // Current RPM for both motors
-int pwmMotor1 = 50; // Fixed PWM for Motor 1
-int pwmMotor2 = 50; // Adjustable PWM for Motor 2
-int trg_rpm1 = 300;
-int trg_rpm2 = 300;
+float rpm1 = 0.0;
+float rpm2 = 0.0;
 
-double d1=0;
-double d2=0;
+// Number of subdivisions (pulses) per revolution
+const int subdivisions = 20;
 
-void docount1() {
-  counter1++;
-  d1+=0.1884/20;
+// Interrupt service routines for encoders
+void encoder1ISR() {
+  encoder1Count++; // Increment count for each pulse
 }
 
-void docount2() {
-  counter2++;
-  d2+=0.1884/20;
-}
-
-void timerIsr() {
-  Timer1.detachInterrupt(); // Stop the timer temporarily
-
-  // Calculate RPM for Motor 1
-  rpm1 = (counter1 * 60) / 20; // Assuming 20 holes in the disc
-  counter1 = 0; // Reset counter
-
-  // Calculate RPM for Motor 2
-  rpm2 = (counter2 * 60) / 20; // Assuming 20 holes in the disc
-  counter2 = 0; // Reset counter
-
-  // Display RPMs
-  Serial.print("Motor 1 RPM: ");
-  Serial.println(rpm1);
-
-  Serial.print("Motor 2 RPM: ");
-  Serial.println(rpm2);
-
-  // Simple speed matching adjustment
-  int error1 = trg_rpm1 - rpm1;
-
-  if (error1 > 5) {
-    // Motor 2 is slower; increase its PWM
-    pwmMotor1 += 1;
-  } else if (error1 < -5) {
-    // Motor 2 is faster; decrease its PWM
-    pwmMotor1 -= 1;
-  }
-
-
-    int error2 = trg_rpm2 - rpm2;
-
-  if (error2 > 5) {
-    // Motor 2 is slower; increase its PWM
-    pwmMotor2 += 1;
-  } else if (error2 < -5) {
-    // Motor 2 is faster; decrease its PWM
-    pwmMotor2 -= 1;
-  }
-
-  // Constrain PWM values to valid range (0-255)
-  pwmMotor2 = constrain(pwmMotor2, 0, 255);
-
-  // Display adjustment
-  Serial.print("Error1: ");
-  Serial.println(error1);
-
-  Serial.print("Error2: ");
-  Serial.println(error2);
-
-  Serial.print("PWM Motor 1: ");
-  Serial.println(pwmMotor1);
-
-  Serial.print("PWM Motor 2: ");
-  Serial.println(pwmMotor2);
-
-   Serial.print("Dist Motor 1: ");
-  Serial.println(d1);
-
-  Serial.print("Dist Motor 2: ");
-  Serial.println(d2);
-
-
-  Serial.println("-------------------------");
-
-  Timer1.attachInterrupt(timerIsr); // Re-enable the timer
+void encoder2ISR() {
+  encoder2Count++; // Increment count for each pulse
 }
 
 void setup() {
+  // Initialize serial communication
   Serial.begin(9600);
-   motorDriver.begin();    
- 
-  // Speed sensor pin modes
-  pinMode(sensor1, INPUT);
-  pinMode(sensor2, INPUT);
 
-  // Set up Timer1 for 1-second intervals
-  Timer1.initialize(1000000); // 1 second
-  Timer1.attachInterrupt(timerIsr);
+  // Set encoder pins as input
+  pinMode(encoder1Pin, INPUT);
+  pinMode(encoder2Pin, INPUT);
 
-  // Attach interrupts for speed sensors
-  attachInterrupt(digitalPinToInterrupt(sensor1), docount1, RISING);
-  attachInterrupt(digitalPinToInterrupt(sensor2), docount2, RISING);
+  // Attach interrupts
+  attachInterrupt(digitalPinToInterrupt(encoder1Pin), encoder1ISR, RISING); // Trigger on rising edge
+  attachInterrupt(digitalPinToInterrupt(encoder2Pin), encoder2ISR, RISING); // Trigger on rising edge
+
+  // Debugging message
+  Serial.println("Setup complete. Starting RPM measurement...");
 }
 
 void loop() {
-  // Drive Motor 1 at constant speed
-  /*analogWrite(b1a, pwmMotor1); // Set PWM for Motor 1
-  digitalWrite(b1b, 1); // Set rotation direction (Clockwise)
-  setSpeedBoth
 
-  // Drive Motor 2 with adjusted speed
-  analogWrite(c1a, pwmMotor2); // Set PWM for Motor 2
-  digitalWrite(c1b, 1); // Set rotation direction (Clockwise)*/
-   //analogWrite(9, 255);
+  unsigned long currentTime = millis();
 
-  //motorDriver.setSpeedBoth(pwmMotor1,pwmMotor2,0);
- motorDriver.setSpeedBoth(100,100,0);
-  
+  motorDriver.setSpeedBoth(40, 40,0);
+
+  // Calculate RPM every 1 second
+  if (currentTime - lastTime >= interval) {
+    lastTime = currentTime;
+
+    // Calculate RPM by dividing counts by the number of subdivisions
+    rpm1 = (encoder1Count * 60.0) / (interval / 1000.0) / subdivisions;
+    rpm2 = (encoder2Count * 60.0) / (interval / 1000.0) / subdivisions;
+
+    // Debugging: Print raw counts and calculated RPM
+    Serial.print("Encoder 1 Count: ");
+    Serial.print(encoder1Count);
+    Serial.print(" | RPM: ");
+    Serial.println(rpm1);
+
+    Serial.print("Encoder 2 Count: ");
+    Serial.print(encoder2Count);
+    Serial.print(" | RPM: ");
+    Serial.println(rpm2);
+
+    // Reset counts
+    encoder1Count = 0;
+    encoder2Count = 0;
+  }
 }
