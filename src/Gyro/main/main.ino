@@ -20,19 +20,20 @@ MPU6050 mpu;
 
 // Timers
 unsigned long timer = 0;
-float timeStep = 0.01;
+float timeStep = 0.01, TimeSinceStart=0;
 
 // Pitch, Roll and Yaw values
 float pitch = 0;
 float roll = 0;
 
 // Target yaw angle and current yaw
-double targetYaw = -90;
+double targetYaw = 0;
 double yaw = 0;
+double tyaw=-90;
 double pidOutput;
 
 // PID constants
-double Kp = 1.6, Ki = 0.01, Kd = 0.5; // Tune as needed
+double Kp = 1, Ki = 0, Kd = 0; // Tune as needed
 
 // Create PID controller
 PID yawPID(&yaw, &pidOutput, &targetYaw, Kp, Ki, Kd, DIRECT);
@@ -64,6 +65,7 @@ void setup()
   yawPID.SetMode(AUTOMATIC);
   yawPID.SetOutputLimits(-30, 30); // Adjust limits for motor control range
   motorDriver.begin();
+  yaw=tyaw;
 }
 
 void loop()
@@ -85,26 +87,38 @@ void loop()
  // Serial.print(roll);  
   Serial.print(" Yaw = ");
   Serial.println(yaw);
+  Serial.print(" TimeSinceStart = ");
+  Serial.println(TimeSinceStart);
+ 
    //Serial.print(" Yaw = ");
  //motorDriver.setSpeedBoth(-95,95,0);
- int acc=5;
+ int acc=10;
 
- if(yaw>=-90+acc){
- motorDriver.setSpeedBoth(-95,95,0);
+ if(yaw>=0+acc){
+ motorDriver.setSpeedBoth(+35,-35,0);
  Serial.println("Left");
 
-}else if(yaw<=-90-acc){
- motorDriver.setSpeedBoth(95,-95,0);
+}else if(yaw<=0-acc){
+ motorDriver.setSpeedBoth(-35,+35,0);
 Serial.println("Right");
  
  }else{
  yawPID.Compute();
- // motorDriver.setSpeedBoth(85-pidOutput,80+pidOutput,0);
-  motorDriver.stopAll();
+  motorDriver.setSpeedBoth(45-pidOutput,45+pidOutput,0);
+ // motorDriver.stopAll();
   Serial.println(pidOutput);
 
   Serial.println("frw");
+  tyaw=-tyaw;
+  TimeSinceStart+=timeStep;
 
+  if(TimeSinceStart>2){
+    TimeSinceStart=0;
+    yaw=-180;
+    
+    }
+  //delay(1000);
+  // yaw=tyaw;
    //mpu.calibrateGyro();
 
  }
