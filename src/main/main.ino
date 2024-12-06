@@ -188,7 +188,7 @@ void loop()
    
     yawPID.Compute();
      motorA = 35 -yawPIDOutput;
-     motorB = 35 + yawPIDOutput; 
+     motorB = 30 + yawPIDOutput; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
    //motorDriver.stopAll();
