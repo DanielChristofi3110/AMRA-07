@@ -12,7 +12,7 @@ MPU6050 mpu;
 int way_angle[3] = {0,120,120};
 float way_dist[3] = {500,500,500};// distance in mm
 float dm1=0,dm2=0;
-int c_way=0,finish_way=2;
+int c_way=0,finish_way=3;
 
 
 
@@ -84,11 +84,13 @@ void setup()
 
   pinMode(13, OUTPUT);
 
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 60; i++) {
     digitalWrite(13, HIGH);
     Serial.println(i);
     delay(500);
+    if(i>40){
     digitalWrite(13, LOW);
+    }
     delay(500);
   }
 
@@ -99,7 +101,7 @@ void setup()
   yawPID.SetMode(AUTOMATIC);
   yawPID.SetOutputLimits(-30, 30); // Yaw PID output range
   rotationPID.SetMode(AUTOMATIC);
-  rotationPID.SetOutputLimits(-30, 30); // Rotation speed range for fine-tuning
+  rotationPID.SetOutputLimits(-25, 25); // Rotation speed range for fine-tuning
 
   motorDriver.begin();
   yaw = way_angle[c_way]; // Initialize yaw
@@ -149,7 +151,7 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 10; // Tolerance around the target yaw
+  int acc = 5; // Tolerance around the target yaw
 
 
 
@@ -167,6 +169,8 @@ void loop()
      Serial.println(way_dist[c_way]);
      Serial.print("Way angle ");
      Serial.println(way_angle[c_way]);
+
+     yawPID.Compute();
   if (abs(yaw) > acc) {
 
     State=rotating;
@@ -176,7 +180,7 @@ void loop()
     // Serial.print("Rot pid");
     
 
-     motorA = -rotationPIDOutput;
+     motorA = -(float)(rotationPIDOutput)*1.2;
      motorB = rotationPIDOutput; 
 
     
@@ -186,12 +190,12 @@ void loop()
   } else {
      State=forward;
    
-    yawPID.Compute();
+    
      motorA = 35 -yawPIDOutput;
      motorB = 30 + yawPIDOutput; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
-   //motorDriver.stopAll();
+ //  motorDriver.stopAll();
    
    //way_dist[c_way]-= timeStep;
     if (way_dist[c_way] <= ((dm1 + dm2) / 2.0)) {
