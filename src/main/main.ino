@@ -12,7 +12,7 @@ MPU6050 mpu;
 int way_angle[3] = {0,120,120};
 float way_dist[3] = {500,500,500};// distance in mm
 float dm1=0,dm2=0;
-int c_way=0,finish_way=3;
+int c_way=0,finish_way=2;
 
 
 
