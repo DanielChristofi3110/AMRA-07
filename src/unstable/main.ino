@@ -19,6 +19,8 @@ int c_way=0,finish_way=2;
 // Timers
 unsigned long timer = 0;
 float timeStep = 0.01, TimeSinceStart = 0;
+const float time_to_stab = 1;
+float c_time_to_stab=0;
 
 // Encoder variables
 volatile unsigned int encoderCount1 = 0; // Count pulses for encoder 1
@@ -35,10 +37,10 @@ double yaw = 0;
 double yawPIDOutput, rotationPIDOutput;
 
 // PID constants for yaw control
-double yawKp = 1, yawKi = 0, yawKd = 0; 
+double yawKp = 0.75, yawKi = 1.0, yawKd = 0.1; 
 
 // PID constants for rotation control
-double rotKp = 10, rotKi = 0.6, rotKd = 0.04; 
+double rotKp = 1, rotKi = 0, rotKd = 0; 
 
 //motors
 int motorA=0,motorB=0;
@@ -84,9 +86,9 @@ void setup()
 
   pinMode(13, OUTPUT);
 
-  for (int i = 0; i < 60; i++) {
+  for (int i = 0; i < 20; i++) {
     digitalWrite(13, HIGH);
-    Serial.println(i);
+    //Serial.println(i);
     delay(500);
     if(i>40){
     digitalWrite(13, LOW);
@@ -105,6 +107,7 @@ void setup()
 
   motorDriver.begin();
   yaw = way_angle[c_way]; // Initialize yaw
+  c_time_to_stab=time_to_stab;
 
   // Initialize encoders
   attachInterrupt(digitalPinToInterrupt(2), encoder1ISR, RISING);
@@ -131,7 +134,7 @@ void calculateRPM() {
 
 void printTotalDistance() {
   float totalDistance = (dm1 + dm2) / 2.0; // Average distance of both wheels
-  Serial.print("Total Distance Traveled (mm): ");
+  Serial.print("Distance_Traveled_(mm) = ");
   Serial.println(totalDistance);
 }
 
@@ -151,7 +154,7 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 5; // Tolerance around the target yaw
+  int acc = 10; // Tolerance around the target yaw
 
 
 
@@ -160,20 +163,59 @@ void loop()
   if(State!=finish){
 
 
-     Serial.print("State = ");
-     Serial.println(State);
-     Serial.print("Yaw = ");
-     Serial.println(yaw);
+     /**/
+    // Serial.print("State = ");
+    // Serial.println(State);
+     //Serial.print("Yaw = ");
+    // Serial.println(yaw);
 
-     Serial.print("Way dist ");
-     Serial.println(way_dist[c_way]);
-     Serial.print("Way angle ");
-     Serial.println(way_angle[c_way]);
+    // Serial.print("Way dist = ");
+    // Serial.println(way_dist[c_way]);
+    // Serial.print("Way angle = ");
+    // Serial.println(way_angle[c_way]);
 
-     yawPID.Compute();
-  if (abs(yaw) > acc) {
+    // Serial.print("MotorA = ");
+    // Serial.println(motorA);
+    // Serial.print("MotorB = ");
+    // Serial.println(motorB);
+
+     //Serial.print("PID ROTATE = ");
+    
+      //Serial.print("PID YAW = ");
+     //Serial.println(yawPIDOutput);
+    
+     
+      //printTotalDistance();
+
+
+    
+     // Serial.println(yawPIDOutput);
+
+       Serial.print("[");
+       Serial.print(State);
+       Serial.print(",");
+       Serial.print(yaw);
+       Serial.print(",");
+       Serial.print(way_dist[c_way]);
+       Serial.print(",");
+       Serial.print(way_angle[c_way]);
+       Serial.print(",");
+       Serial.print(motorA);
+       Serial.print(",");
+       Serial.print(motorB);
+       Serial.print(",");
+       Serial.print(yawPIDOutput);
+       Serial.print(",");
+       Serial.print(rotationPIDOutput);
+       Serial.println("]");
+
+     
+     
+  if ((abs(yaw) > acc) || (c_time_to_stab>0)) {
 
     State=rotating;
+
+    c_time_to_stab-=timeStep;
 
     rotationPID.Compute();
 
@@ -181,21 +223,23 @@ void loop()
     
 
      motorA = -(float)(rotationPIDOutput)*1.2;
-     motorB = rotationPIDOutput; 
+     motorB = (float)(rotationPIDOutput)*1.0; 
 
     
    // Serial.println(rotationPIDOutput);
     motorDriver.setSpeedBoth(motorA, motorB, 0);
  
-  } else {
+  } else if(c_time_to_stab<=0) {
+     yawPID.Compute();
      State=forward;
+     
    
     
-     motorA = 35 -yawPIDOutput;
-     motorB = 30 + yawPIDOutput; 
+     motorA = (32) -yawPIDOutput;
+     motorB = (30) + yawPIDOutput; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
- //  motorDriver.stopAll();
+  //motorDriver.stopAll();
    
    //way_dist[c_way]-= timeStep;
     if (way_dist[c_way] <= ((dm1 + dm2) / 2.0)) {
@@ -204,6 +248,7 @@ void loop()
          c_way++;
           
           yaw = way_angle[c_way]; // Reset yaw for another turn
+          c_time_to_stab=time_to_stab;
          
 
 
@@ -218,7 +263,7 @@ void loop()
 
   }
 
-  printTotalDistance();
+ 
   // Wait to full timeStep period
   delay((timeStep * 1000) - (millis() - timer));
   }else{
