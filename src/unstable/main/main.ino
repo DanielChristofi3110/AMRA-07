@@ -88,7 +88,7 @@ void setup()
 
   for (int i = 0; i < 20; i++) {
     digitalWrite(13, HIGH);
-    //Serial.println(i);
+    Serial.println(i);
     delay(500);
     if(i>40){
     digitalWrite(13, LOW);
