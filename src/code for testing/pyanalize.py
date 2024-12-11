@@ -190,7 +190,7 @@ def main():
         plot_data(file_name=args.file_name)
     else:
         # Otherwise, connect to Arduino and collect data
-        arduino = serial.Serial(port='COM6', baudrate=115200, timeout=1)
+        arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
         file_name = parse_and_save_data(arduino, duration=40)
         plot_data(file_name)
 
