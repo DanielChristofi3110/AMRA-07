@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.interpolate
 import argparse
+from datetime import datetime
 
 
 def parse_and_save_data(arduino, file_name="arduino_data.csv", duration=30):
@@ -32,7 +33,7 @@ def parse_and_save_data(arduino, file_name="arduino_data.csv", duration=30):
                     if len(values) == 8:
                         # Prepare a dictionary with parsed data
                         data_dict = {
-                            "Timestamp": datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3],
+                            "Timestamp": datetime.now().strftime('%H:%M:%S.%f')[:-3],
                             "State": int(values[0]),
                             "Yaw": float(values[1]),
                             "Way_Dist": float(values[2]),
@@ -68,6 +69,24 @@ def parse_and_save_data(arduino, file_name="arduino_data.csv", duration=30):
     print(f"Data saved to {file_name}. Total entries: {len(data_entries)}.")
     return file_name
 
+
+def send_data_to_arduino(arduino, data):
+    """
+    Send data to the Arduino over the serial connection.
+    """
+    try:
+        if isinstance(data, str):
+            arduino.write(data.encode('utf-8'))
+        elif isinstance(data, (list, tuple)):
+            arduino.write(",".join(map(str, data)).encode('utf-8'))
+        else:
+            print("Invalid data type. Data must be a string, list, or tuple.")
+        time.sleep(0.1)  # Short delay to allow Arduino to process
+        print(f"Sent to Arduino: {data}")
+    except serial.SerialException as e:
+        print(f"Serial error while sending data: {e}")
+
+
 def plot_data(file_name):
     """
     Plot data from a CSV file using timestamps as the x-axis.
@@ -86,7 +105,7 @@ def plot_data(file_name):
 
     # Convert timestamps to matplotlib datetime objects
     if "Timestamp" in data:
-        time_x = [datetime.datetime.strptime(ts, '%H:%M:%S.%f') for ts in data["Timestamp"]]
+        time_x = [datetime.strptime(ts, '%H:%M:%S.%f') for ts in data["Timestamp"]]
         # Convert to seconds since start time for easier interpolation
         time_seconds = [(t - time_x[0]).total_seconds() for t in time_x]
     else:
@@ -185,13 +204,21 @@ def main():
 
     args = parser.parse_args()
 
+    now = datetime.now()
+    current_datetime_string = now.strftime("%Y_%m_%d_%H_%M_%S")
+
     # If a file name is provided, plot the data from that file
     if args.file_name:
         plot_data(file_name=args.file_name)
     else:
         # Otherwise, connect to Arduino and collect data
-        arduino = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
-        file_name = parse_and_save_data(arduino, duration=40)
+        arduino = serial.Serial(port='COM6', baudrate=115200, timeout=1)
+        #send_data_to_arduino(arduino, "120 120 120 800000 800 800")
+        file_name = parse_and_save_data(arduino,file_name="readings_"+str(current_datetime_string)+".csv", duration=30)
+        
+        # Example: Sending data to Arduino
+      
+        
         plot_data(file_name)
 
 

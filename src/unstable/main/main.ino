@@ -19,9 +19,9 @@ int c_way=0,finish_way=2;
 // Timers
 unsigned long timer = 0;
 float timeStep = 0.01, TimeSinceStart = 0;
-const float time_to_stab = 1.5;
+const float time_to_stab = 0.2;
 float c_time_to_stab=0;
-const float time_to_stand = 0.2;
+const float time_to_stand = 1;
 float c_time_to_stand=time_to_stand;
 
 // Encoder variables
@@ -42,7 +42,11 @@ double yawPIDOutput, rotationPIDOutput;
 double yawKp = 0.75, yawKi = 1.0, yawKd = 0.1; 
 
 // PID constants for rotation control
-double rotKp =  3.25, rotKi = 2.0, rotKd =  0.1;
+double rotKp =  0.75, rotKi = 1.0, rotKd =  0.1;
+//double rotKp =  2.42, rotKi = 2.2, rotKd =  0.66;
+//double rotKp =  2.4, rotKi = 2.2, rotKd =  0.65;
+//double rotKp =  2.85, rotKi = 2.25, rotKd =  0.52;
+//double rotKp =  3.25, rotKi = 1.65, rotKd =  0.1;
 //double rotKp =  0.75, rotKi = 1.0, rotKd =  0.97;
 
 //motors
@@ -110,7 +114,7 @@ void setup()
   yawPID.SetMode(AUTOMATIC);
   yawPID.SetOutputLimits(-30, 30); // Yaw PID output range
   rotationPID.SetMode(AUTOMATIC);
-  rotationPID.SetOutputLimits(-35, 35); // Rotation speed range for fine-tuning
+  rotationPID.SetOutputLimits(-25, 25); // Rotation speed range for fine-tuning
 
   motorDriver.begin();
   yaw = way_angle[c_way]; // Initialize yaw
