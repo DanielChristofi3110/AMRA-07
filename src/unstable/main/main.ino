@@ -19,9 +19,9 @@ int c_way=0,finish_way=2;
 // Timers
 unsigned long timer = 0;
 float timeStep = 0.01, TimeSinceStart = 0;
-const float time_to_stab = 0.2;
+const float time_to_stab = 1;
 float c_time_to_stab=0;
-const float time_to_stand = 1;
+const float time_to_stand = 0.2;
 float c_time_to_stand=time_to_stand;
 
 // Encoder variables
