@@ -47,7 +47,7 @@ double rotKp =  3.25, rotKi = 2.0, rotKd =  0.1;
 
 //motors
 int motorA=0,motorB=0;
-const int baseA=45, baseB=38;
+const int baseA=32, baseB=30;
 
 
 //  PID controllers
@@ -253,8 +253,8 @@ void loop()
     // Serial.print("Rot pid");
     
 
-     motorA = -(float)(rotationPIDOutput)*1.6*1.2;
-     motorB = (float)(rotationPIDOutput)*1.0*1.2; 
+     motorA = -(float)(rotationPIDOutput)*1.2;
+     motorB = (float)(rotationPIDOutput)*1.0; 
 
      motorA = constrain(motorA,-baseA,baseA);
      motorB = constrain(motorB,-baseB,baseB);
