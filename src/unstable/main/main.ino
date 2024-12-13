@@ -10,7 +10,7 @@ MPU6050 mpu;
 //way points
 
 int way_angle[3] = {0,120,120};
-float way_dist[3] = {500,500,500};// distance in mm
+float way_dist[3] = {800,800,800};// distance in mm
 float dm1=0,dm2=0;
 int c_way=0,finish_way=2;
 
@@ -19,8 +19,10 @@ int c_way=0,finish_way=2;
 // Timers
 unsigned long timer = 0;
 float timeStep = 0.01, TimeSinceStart = 0;
-const float time_to_stab = 1;
+const float time_to_stab = 1.5;
 float c_time_to_stab=0;
+const float time_to_stand = 0.2;
+float c_time_to_stand=time_to_stand;
 
 // Encoder variables
 volatile unsigned int encoderCount1 = 0; // Count pulses for encoder 1
@@ -40,10 +42,12 @@ double yawPIDOutput, rotationPIDOutput;
 double yawKp = 0.75, yawKi = 1.0, yawKd = 0.1; 
 
 // PID constants for rotation control
-double rotKp = 1, rotKi = 0, rotKd = 0; 
+double rotKp =  3.25, rotKi = 2.0, rotKd =  0.1;
+//double rotKp =  0.75, rotKi = 1.0, rotKd =  0.97;
 
 //motors
 int motorA=0,motorB=0;
+const int baseA=45, baseB=38;
 
 
 //  PID controllers
@@ -55,10 +59,13 @@ enum _state {
     forward,
     rotating,
     finish,
-    stand
+    stand,
+    cmd,
+    none
+
 };
 
-_state State = stand;
+_state State = cmd;
 
 
 // Interrupt service routines for encoders
@@ -103,12 +110,16 @@ void setup()
   yawPID.SetMode(AUTOMATIC);
   yawPID.SetOutputLimits(-30, 30); // Yaw PID output range
   rotationPID.SetMode(AUTOMATIC);
-  rotationPID.SetOutputLimits(-25, 25); // Rotation speed range for fine-tuning
+  rotationPID.SetOutputLimits(-35, 35); // Rotation speed range for fine-tuning
 
   motorDriver.begin();
   yaw = way_angle[c_way]; // Initialize yaw
-  c_time_to_stab=time_to_stab;
-
+  if(way_angle[c_way]>0){
+   c_time_to_stab=time_to_stab;
+  }else{
+    
+    c_time_to_stab=0;
+    }
   // Initialize encoders
   attachInterrupt(digitalPinToInterrupt(2), encoder1ISR, RISING);
   attachInterrupt(digitalPinToInterrupt(3), encoder2ISR, RISING);
@@ -143,6 +154,38 @@ void resetDistance() {
   dm2 = 0;
 }
 
+void populateArrays(int way_angle[], float way_dist[], int size) {
+  // Ensure the size matches the expected size of the arrays (3 in this case)
+  if (size != 3) {
+    Serial.println("Error: Array size mismatch. Expected size: 3.");
+    return;
+  }
+
+  Serial.println("Enter 3 angle values followed by 3 distance values:");
+
+  // Wait for user input for all values
+  while (Serial.available() < 6) {
+    // Wait until at least 6 values are entered (3 angles + 3 distances)
+  }
+
+  // Read angle values
+  for (int i = 0; i < 3; i++) {
+    way_angle[i] = Serial.parseInt();
+  }
+
+  // Read distance values
+  for (int i = 0; i < 3; i++) {
+    way_dist[i] = Serial.parseFloat();
+  }
+
+  Serial.println("Arrays populated successfully vals.");
+
+   for (int i = 0; i < 3; i++) {
+    Serial.println(way_dist[i]);
+  }
+}
+
+
 void loop()
 {
   //calculateRPM(); // Update RPM values
@@ -154,49 +197,36 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 10; // Tolerance around the target yaw
+  int acc = 3.5; // Tolerance around the target yaw
 
 
+  if(State==cmd){
 
+      populateArrays(way_angle,way_dist,3);
+      State=none;
 
   
-  if(State!=finish){
+  }else if(State==stand){
 
-
-     /**/
-    // Serial.print("State = ");
-    // Serial.println(State);
-     //Serial.print("Yaw = ");
-    // Serial.println(yaw);
-
-    // Serial.print("Way dist = ");
-    // Serial.println(way_dist[c_way]);
-    // Serial.print("Way angle = ");
-    // Serial.println(way_angle[c_way]);
-
-    // Serial.print("MotorA = ");
-    // Serial.println(motorA);
-    // Serial.print("MotorB = ");
-    // Serial.println(motorB);
-
-     //Serial.print("PID ROTATE = ");
+      motorDriver.stopAll();
+      c_time_to_stand-=timeStep;
+      if(c_time_to_stand<=0){
+        State=none;
+        c_time_to_stand=time_to_stand;
+         Serial.println("end_Stand");
+        }
+      
     
-      //Serial.print("PID YAW = ");
-     //Serial.println(yawPIDOutput);
-    
-     
-      //printTotalDistance();
+    }else if(State!=finish){
 
 
-    
-     // Serial.println(yawPIDOutput);
-
+   
        Serial.print("[");
        Serial.print(State);
        Serial.print(",");
        Serial.print(yaw);
        Serial.print(",");
-       Serial.print(way_dist[c_way]);
+       Serial.print((dm1 + dm2) / 2.0);
        Serial.print(",");
        Serial.print(way_angle[c_way]);
        Serial.print(",");
@@ -211,8 +241,9 @@ void loop()
 
      
      
-  if ((abs(yaw) > acc) || (c_time_to_stab>0)) {
+  if ( ((abs(yaw) > acc)&&(State!=forward)) || (c_time_to_stab>0)) {
 
+  
     State=rotating;
 
     c_time_to_stab-=timeStep;
@@ -222,21 +253,26 @@ void loop()
     // Serial.print("Rot pid");
     
 
-     motorA = -(float)(rotationPIDOutput)*1.2;
-     motorB = (float)(rotationPIDOutput)*1.0; 
+     motorA = -(float)(rotationPIDOutput)*1.6*1.2;
+     motorB = (float)(rotationPIDOutput)*1.0*1.2; 
 
+     motorA = constrain(motorA,-baseA,baseA);
+     motorB = constrain(motorB,-baseB,baseB);
     
    // Serial.println(rotationPIDOutput);
     motorDriver.setSpeedBoth(motorA, motorB, 0);
  
-  } else if(c_time_to_stab<=0) {
+  } else if((c_time_to_stab<=0)|| (State==forward)) {
      yawPID.Compute();
      State=forward;
      
    
     
-     motorA = (32) -yawPIDOutput;
-     motorB = (30) + yawPIDOutput; 
+    // motorA = (32) -yawPIDOutput;
+    // motorB = (30) + yawPIDOutput; 
+
+     motorA = (baseA) -yawPIDOutput;
+     motorB = (baseB) + yawPIDOutput; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
   //motorDriver.stopAll();
@@ -249,6 +285,7 @@ void loop()
           
           yaw = way_angle[c_way]; // Reset yaw for another turn
           c_time_to_stab=time_to_stab;
+          State=stand;
          
 
 
@@ -264,20 +301,20 @@ void loop()
   }
 
  
-  // Wait to full timeStep period
+ 
   delay((timeStep * 1000) - (millis() - timer));
-  }else{
-    Serial.println("FIN");
-     motorDriver.stopAll();
+  }
 
-    digitalWrite(13, HIGH);
+    
+     //Serial.println("FIN");
+ 
+
+
+    
+    
   
-    delay(200);
-    digitalWrite(13, LOW);
-    delay(200);
-    
-    
-    }
+      
+      
   
  
 }
