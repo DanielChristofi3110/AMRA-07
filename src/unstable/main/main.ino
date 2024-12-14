@@ -51,7 +51,7 @@ double rotKp =  0.75, rotKi = 1.0, rotKd =  0.1;
 
 //motors
 int motorA=0,motorB=0;
-const int baseA=32, baseB=30;
+ int baseA=32, baseB=30;
 
 
 //  PID controllers
@@ -70,6 +70,11 @@ enum _state {
 };
 
 _state State = cmd;
+
+//voltage
+const float max_v=1200;
+float cur_v=1200,cur_scale=max_v/cur_v;
+
 
 
 // Interrupt service routines for encoders
@@ -165,11 +170,11 @@ void populateArrays(int way_angle[], float way_dist[], int size) {
     return;
   }
 
-  Serial.println("Enter 3 angle values followed by 3 distance values:");
+  Serial.println("Enter 3 angle values followed by 3 distance values 1 volts:");
 
   // Wait for user input for all values
-  while (Serial.available() < 6) {
-    // Wait until at least 6 values are entered (3 angles + 3 distances)
+  while (Serial.available() < 7) {
+    // Wait until at least 7 values are entered (3 angles + 3 distances)
   }
 
   // Read angle values
@@ -182,11 +187,19 @@ void populateArrays(int way_angle[], float way_dist[], int size) {
     way_dist[i] = Serial.parseFloat();
   }
 
+  cur_v=Serial.parseFloat();
+  cur_scale=max_v/cur_v;
+  baseA=(float)cur_scale*baseA;
+  baseB=(float)cur_scale*baseB;
+
+  
+
   Serial.println("Arrays populated successfully vals.");
 
    for (int i = 0; i < 3; i++) {
     Serial.println(way_dist[i]);
   }
+  Serial.println(cur_scale);
 }
 
 
