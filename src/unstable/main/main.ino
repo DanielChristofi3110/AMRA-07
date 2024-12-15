@@ -188,6 +188,9 @@ void populateArrays(int way_angle[], float way_dist[], int size) {
   }
 
   cur_v=Serial.parseFloat();
+  if(cur_v<800){
+    cur_v=800;
+    }
   cur_scale=max_v/cur_v;
   baseA=(float)cur_scale*baseA;
   baseB=(float)cur_scale*baseB;
@@ -270,8 +273,8 @@ void loop()
     // Serial.print("Rot pid");
     
 
-     motorA = -(float)(rotationPIDOutput)*1.2;
-     motorB = (float)(rotationPIDOutput)*1.0; 
+     motorA = -(float)(rotationPIDOutput)*1.2*cur_scale;
+     motorB = (float)(rotationPIDOutput)*1.0*cur_scale; 
 
      motorA = constrain(motorA,-baseA,baseA);
      motorB = constrain(motorB,-baseB,baseB);
@@ -288,8 +291,8 @@ void loop()
     // motorA = (32) -yawPIDOutput;
     // motorB = (30) + yawPIDOutput; 
 
-     motorA = (baseA) -yawPIDOutput;
-     motorB = (baseB) + yawPIDOutput; 
+     motorA = (float)(baseA) -yawPIDOutput*cur_scale;
+     motorB = (float)(baseB) + yawPIDOutput*cur_scale; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
   //motorDriver.stopAll();
