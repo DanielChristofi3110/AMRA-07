@@ -42,9 +42,9 @@ double yawPIDOutput, rotationPIDOutput;
 double yawKp = 0.75, yawKi = 1.0, yawKd = 0.1; 
 
 // PID constants for rotation control
-double rotKp =  0.75, rotKi = 1.0, rotKd =  0.1;
+//double rotKp =  0.75, rotKi = 1.0, rotKd =  0.1;
 //double rotKp =  2.42, rotKi = 2.2, rotKd =  0.66;
-//double rotKp =  2.4, rotKi = 2.2, rotKd =  0.65;
+double rotKp =  2.4, rotKi = 2.2, rotKd =  0.65;
 //double rotKp =  2.85, rotKi = 2.25, rotKd =  0.52;
 //double rotKp =  3.25, rotKi = 1.65, rotKd =  0.1;
 //double rotKp =  0.75, rotKi = 1.0, rotKd =  0.97;
@@ -217,7 +217,7 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 3.5; // Tolerance around the target yaw
+  int acc = 1.5; // Tolerance around the target yaw
 
 
   if(State==cmd){
