@@ -217,7 +217,7 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 1.5; // Tolerance around the target yaw
+  int acc = 1.0; // Tolerance around the target yaw
 
 
   if(State==cmd){
