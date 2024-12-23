@@ -1,0 +1,94 @@
+@startuml
+
+title PERT Diagram
+
+skinparam defaultTextAlignment center
+skinparam style strictuml
+left to right direction
+
+circle "Start" as task_start
+
+circle "T1" as task_T1
+circle "T2" as task_T2
+circle "T3" as task_T3
+circle "T4" as task_T4
+circle "T5" as task_T5
+circle "T6" as task_T6
+circle "T7" as task_T7
+circle "T8" as task_T8
+circle "T9" as task_T9
+circle "T10" as task_T10
+circle "T11" as task_T11
+circle "T12" as task_T12
+circle "T13" as task_T13
+circle "T14" as task_T14
+circle "T15" as task_T15
+circle "T16" as task_T16
+circle "T17" as task_T17
+circle "T18" as task_T18
+circle "T19" as task_T19
+circle "T20" as task_T20
+circle "T21" as task_T21
+circle "Finish" as task_finish
+
+task_start --> task_T1
+
+task_T1 --> task_T2
+
+task_T1 --> task_T3
+
+task_T1 --> task_T4
+
+task_T1 --> task_T5
+
+task_T1 --> task_T6
+
+task_T4 --> task_T7
+
+task_T3 --> task_T7
+
+task_T5 --> task_T8
+
+task_T6 --> task_T8
+
+task_T8 --> task_T9
+
+task_T7 --> task_T9
+
+task_T2 --> task_T9
+
+task_T9 --> task_T10
+
+task_T10 --> task_T11
+
+task_T9 --> task_T12
+
+task_T9 --> task_T13
+
+task_T11 --> task_T14
+
+task_T11 --> task_T15
+
+task_T14 --> task_T16
+
+task_T15 --> task_T16
+
+task_T10 --> task_T16
+
+task_T16 --> task_T17
+
+task_T17 --> task_T18
+
+task_T18 --> task_T19
+
+task_T19 --> task_T20
+
+task_T20 --> task_T21
+
+task_T21 --> task_finish
+
+task_T12 --> task_T19
+
+task_T13 --> task_T19
+
+@enduml
