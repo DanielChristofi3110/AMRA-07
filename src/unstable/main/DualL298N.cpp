@@ -42,30 +42,6 @@ void DualL298N::gradualSpeedChange(int &currentSpeedA, int targetSpeedA, int &cu
     setMotorDirection(_in1, _in2, directionA);               
     setMotorDirection(_in3, _in4, directionB);           
 
-    /*while (currentSpeedA != targetSpeedA || currentSpeedB != targetSpeedB) {
-        
-        if (currentSpeedA < targetSpeedA) {
-            currentSpeedA++;
-        } else if (currentSpeedA > targetSpeedA) {
-            currentSpeedA--;
-        }
-
-        if (currentSpeedB < targetSpeedB) {
-            currentSpeedB++;
-        } else if (currentSpeedB > targetSpeedB) {
-            currentSpeedB--;
-        }
-
-      
-        int pwmValueA = map(abs(currentSpeedA), 0, 100, 0, 255);
-        int pwmValueB = map(abs(currentSpeedB), 0, 100, 0, 255);
-
-        analogWrite(_ena, pwmValueA); 
-        analogWrite(_enb, pwmValueB); 
-
-        delay(stepDelay);             
-    }*/
-
     int pwmValueA = map(abs(targetSpeedA), 0, 100, 0, 255);
     int pwmValueB = map(abs(targetSpeedB), 0, 100, 0, 255);
 

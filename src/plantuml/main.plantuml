@@ -1,0 +1,69 @@
+@startuml
+start
+
+title Arduino Program Flow
+
+:Initialize Variables and Constants;
+:Setup Serial Communication;
+:Initialize MPU6050;
+if (MPU6050 not initialized?) then (yes)
+  :Print Error Message;
+  :Retry Initialization;
+else (no)
+  :Calibrate Gyroscope;
+endif
+
+:Initialize PID Controllers;
+:Attach Interrupts for Encoders;
+
+while (true) is (Loop)
+  :Read Gyroscope Data;
+  :Update Yaw;
+
+  if (State == cmd?) then (yes)
+    :Populate Arrays for Waypoints;
+    :Set State to none;
+  else (no)
+    if (State == stand?) then (yes)
+      :Stop Motors;
+      :Decrement c_time_to_stand;
+      if (c_time_to_stand <= 0?) then (yes)
+        :Set State to none;
+        :Reset c_time_to_stand;
+      endif
+    else (no)
+      if (State != finish?) then (yes)
+        :Print Debug Information;
+
+        if ((abs(yaw) > acc && State != forward) || (c_time_to_stab > 0)?) then (yes)
+          :Set State to rotating;
+          :Decrement c_time_to_stab;
+          :Compute Rotation PID;
+          :Update Motor Speeds for Rotation;
+        else (no)
+          :Set State to forward;
+          :Compute Yaw PID;
+          :Update Motor Speeds for Forward Movement;
+
+          if (way_dist[c_way] <= (dm1 + dm2) / 2.0?) then (yes)
+            if (c_way < finish_way?) then (yes)
+              :Reset Distance;
+              :Increment c_way;
+              :Update Yaw for Next Waypoint;
+              :Set c_time_to_stab;
+              :Set State to stand;
+            else (no)
+              :Set State to finish;
+              :Stop Motors;
+            endif
+          endif
+        endif
+      endif
+    endif
+  endif
+
+  :Delay for Time Step;
+endwhile (Loop)
+
+stop
+@enduml

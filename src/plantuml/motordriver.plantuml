@@ -1,0 +1,47 @@
+@startuml
+start
+
+title DualL298N Motor Driver Flowchart
+
+:Initialize Variables and Constants in Constructor;
+
+if (begin() called?) then (yes)
+  :Set Pin Modes for IN1, IN2, ENA, IN3, IN4, ENB;
+  :Enable Motors by Setting ENA and ENB HIGH;
+else (no)
+  :Wait for Initialization;
+endif
+
+while (true) is (Main Loop)
+  if (setMotorASpeed() or setMotorBSpeed() called?) then (yes)
+    :Constrain Speed to [-100, 100];
+    :Call gradualSpeedChange() with Current and Target Speeds;
+
+    if (gradualSpeedChange() called?) then (yes)
+      :Determine Direction for Motors A and B;
+      :Set Motor Directions using setMotorDirection();
+      :Map Target Speeds to PWM Values;
+      :Apply PWM Values to ENA and ENB;
+    endif
+  endif
+
+  if (stopMotorA() or stopMotorB() called?) then (yes)
+    :Set Current Speed of Motor to 0;
+    :Write 0 PWM to ENA or ENB;
+  endif
+
+  if (setSpeedBoth() called?) then (yes)
+    :Constrain Speeds for Both Motors to [-100, 100];
+    :Call gradualSpeedChange() for Both Motors;
+  endif
+
+  if (stopAll() called?) then (yes)
+    :Set Current Speeds of Both Motors to 0;
+    :Write 0 PWM to ENA and ENB;
+    :Set All Motor Direction Pins (IN1, IN2, IN3, IN4) to LOW;
+  endif
+
+endwhile (Main Loop)
+
+stop
+@enduml
