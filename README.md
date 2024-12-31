@@ -15,10 +15,9 @@ A simple robot designed to draw triangles of adjustable sizes. This project prov
 1. [Overview](#overview)
 2. [Parts List](#parts-list)
 3. [Assembly Instructions](#assembly-instructions)
-4. [Wiring Diagram](#wiring-diagram)
-5. [Code](#code)
-6. [Contributing](#contributing)
-7. [License](#license)
+4. [Code](#code)
+5. [Contributing](#contributing)
+6. [License](#license)
 
 ---
 
@@ -54,84 +53,97 @@ Follow these steps to assemble your robot as per the provided diagram:
 
 ![ROBOT Diagram 2](images/all_diag.png)
 
----
-
 #### 1. **Base Assembly:**
-   - Use the **HAITRONIC HRO238 2WD kit** to form the robot's base.
-   - Attach the two **DC motors** to the motor slots on the base.
-   - Fix the **castor wheel** at the front as shown in the diagram.
+
+- Use the **HAITRONIC HRO238 2WD kit** to form the robot's base.
+- Attach the two **DC motors** to the motor slots on the base.
+- Fix the **castor wheel** at the front as shown in the diagram.
 
 ---
 
 #### 2. **Power Supply:**
-   - Mount the **18650 battery holder** on the base. 
-   - Ensure it can hold three **18650 rechargeable batteries**.
-   - Connect the holder's output wires to the **L298N motor driver** for power distribution.
+
+- Mount the **18650 battery holder** on the base.
+- Ensure it can hold three **18650 rechargeable batteries**.
+- Connect the holder's output wires to the **L298N motor driver** for power distribution.
 
 ---
 
 #### 3. **Arduino Uno R3:**
-   - Secure the **Arduino Uno R3** in the designated slot on the base.
-   - Ensure it is oriented as shown, with the USB port facing outward for easy access.
+
+- Secure the **Arduino Uno R3** in the designated slot on the base.
+- Ensure it is oriented as shown, with the USB port facing outward for easy access.
 
 ---
 
 #### 4. **Motor Driver (L298N):**
-   - Place the **L298N motor driver** near the motors.
-   - Connect the motor driver outputs to the DC motors.
-   - Attach the motor driver’s power input to the **18650 battery holder**.
+
+- Place the **L298N motor driver** near the motors.
+- Connect the motor driver outputs to the DC motors.
+- Attach the motor driver’s power input to the **18650 battery holder**.
 
 ---
 
 #### 5. **MPU6050 (Accelerometer and Gyroscope):**
-   - Mount the **MPU6050** near the Arduino Uno.
-   - Connect the MPU6050's SDA and SCL pins to the corresponding pins on the Arduino.
+
+- Mount the **MPU6050** near the Arduino Uno.
+- Connect the MPU6050's SDA and SCL pins to the corresponding pins on the Arduino.
 
 ---
 
 #### 6. **HC-05 Bluetooth Module:**
-   - Position the **HC-05 Bluetooth module** as shown.
-   - Connect its RX and TX pins to the Arduino's TX and RX pins, respectively.
-   - Ensure the module's power pins are connected to the Arduino’s 3.3V and GND.
+
+- Position the **HC-05 Bluetooth module** as shown.
+- Connect its RX and TX pins to the Arduino's TX and RX pins, respectively.
+- Ensure the module's power pins are connected to the Arduino’s 3.3V and GND.
 
 ---
 
 #### 7. **Speed Sensors (LM393 Encoders):**
-   - Install one **LM393 speed sensor** for each motor.
-   - Align the sensors with the motor wheels to measure speed accurately.
-   - Connect the sensor outputs to the Arduino's digital input pins.
+
+- Install one **LM393 speed sensor** for each motor.
+- Align the sensors with the motor wheels to measure speed accurately.
+- Connect the sensor outputs to the Arduino's digital input pins.
 
 ---
 
 #### 8. **Wiring:**
-   - Refer to the pin diagram for detailed connections:
-     - **Arduino Uno** pins are connected to the **L298N motor driver**, **MPU6050**, **HC-05**, and **LM393 sensors**.
-     - Power for all components is supplied through the **18650 battery holder**.
 
----
-
-#### 9. **Final Check:**
-   - Ensure all connections are secure and wires are neatly organized to avoid interference.
-   - Verify that the components match the locations and orientations in the diagram.
-
----
-
-If you encounter issues, refer to the parts list and verify each component's connection with the diagram.
-
-## Wiring Diagram
-Below is the wiring diagram showing how to connect the microcontroller, motor drivers, and stepper motors.
+- Refer to the updated wiring diagram for detailed connections:
 
 ![Wiring Diagram](images/bp1.png)
 
 ### Key Connections
+
 - **Stepper Motor 1**: Connect to Motor Driver 1 output pins.
 - **Stepper Motor 2**: Connect to Motor Driver 2 output pins.
 - **Motor Drivers**: Connect to the microcontroller as follows:
   - Step pin: Digital pin D2 (Motor Driver 1), D3 (Motor Driver 2).
   - Direction pin: Digital pin D4 (Motor Driver 1), D5 (Motor Driver 2).
+- **MPU6050**:
+  - SDA: Connect to A4 on Arduino.
+  - SCL: Connect to A5 on Arduino.
+- **HC-05 Bluetooth Module**:
+  - RX: Connect to D10 on Arduino.
+  - TX: Connect to D11 on Arduino.
+- **Speed Sensors**:
+  - Sensor 1 output: Connect to D6 on Arduino.
+  - Sensor 2 output: Connect to D7 on Arduino.
 - **Power Supply**: Connect to motor driver VCC and GND.
 
 ---
+
+#### 9. **Final Check:**
+
+- Ensure all connections are secure and wires are neatly organized to avoid interference.
+- Verify that the components match the locations and orientations in the diagram.
+
+---
+
+
+If you encounter issues, refer to the parts list and verify each component's connection with the diagram.
+
+
 
 ## Code
 Upload the following Arduino sketch to the microcontroller to control the robot:
