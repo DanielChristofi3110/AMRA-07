@@ -50,11 +50,12 @@ This project is a beginner-friendly robot that uses stepper motors, a microcontr
 
 ## Assembly Instructions
 1. Assemble the chassis base and attach the wheels.
-2. Mount the stepper motors onto the chassis.
-3. Secure the pen holder in the center of the chassis.
-4. Place the microcontroller and motor drivers on the chassis or breadboard.
-5. Connect the power supply to the motor drivers and microcontroller.
-6. Wire the components as per the wiring diagram.
+2. Mount the dc motors onto the chassis.
+3. Mount the encoders above the motors .
+4. Secure the pen holder in the center of the chassis.
+5. Place the microcontroller and motor drivers on the chassis or breadboard.
+6. Connect the power supply to the motor drivers and microcontroller.
+7. Wire the components as per the wiring diagram.
 
 ---
 
