@@ -25,7 +25,8 @@ A simple robot designed to draw triangles of adjustable sizes. This project prov
 ## Overview
 This project is a beginner-friendly robot that uses stepper motors, a microcontroller, and a pen to draw triangles. Below is a diagram of the robot with all electronics labeled.
 
-![Robot Diagram](diagram_of_robot.png)
+![ROBOT Diagram 1](images/all.png)
+![ROBOT Diagram 2](images/all_diag.png)
 
 ---
 
@@ -60,7 +61,7 @@ This project is a beginner-friendly robot that uses stepper motors, a microcontr
 ## Wiring Diagram
 Below is the wiring diagram showing how to connect the microcontroller, motor drivers, and stepper motors.
 
-![Wiring Diagram](wiring_diagram.png)
+![Wiring Diagram](images/bp1.png)
 
 ### Key Connections
 - **Stepper Motor 1**: Connect to Motor Driver 1 output pins.
