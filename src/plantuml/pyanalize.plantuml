@@ -1,0 +1,80 @@
+@startuml
+start
+
+:Initialize Argument Parser;
+if (File name provided?) then (yes)
+    :Call plot_data(file_name);
+    stop
+else (no)
+    :Connect to Arduino (Serial Port);
+    :Generate current_datetime_string;
+    :Call parse_and_save_data(
+        arduino, file_name="readings_" + current_datetime_string + ".csv", duration=30);
+    :Call plot_data(file_name);
+
+endif
+
+stop
+
+' Function parse_and_save_data
+partition "Function: parse_and_save_data" {
+    start
+    :Initialize start_time, data_entries;
+    :Open CSV file for writing;
+    repeat
+        :Read a line from Arduino;
+        if (Line valid?) then (yes)
+            if (Data has 8 values?) then (yes)
+                :Parse data into dictionary;
+                if (Headers not written?) then (yes)
+                    :Write headers to CSV;
+                endif
+                :Write data row to CSV;
+                :Add data to data_entries;
+            else (no)
+                :Print "Malformed data";
+            endif
+        else (no)
+            :Print "Ignoring invalid line";
+        endif
+    repeat while (time elapsed < duration)
+    :Close file;
+    :Return file_name;
+    stop
+}
+
+' Function send_data_to_arduino
+partition "Function: send_data_to_arduino" {
+    start
+    if (Data is string?) then (yes)
+        :Send string to Arduino;
+    else if (Data is list/tuple?) then (yes)
+        :Convert list/tuple to string and send;
+    else (no)
+        :Print "Invalid data type";
+    endif
+    :Short delay for Arduino processing;
+    stop
+}
+
+' Function plot_data
+partition "Function: plot_data" {
+    start
+    :Open CSV file and read data;
+    if (Timestamp data available?) then (yes)
+        :Convert timestamps to seconds;
+        :Generate fine time range for interpolation;
+        :Prepare subplots;
+        :Interpolate and plot State;
+        :Interpolate and plot Yaw;
+        :Interpolate and plot Way_Dist;
+        :Interpolate and plot MotorA and MotorB;
+        :Interpolate and plot YawPIDOutput;
+        :Interpolate and plot RotationPIDOutput;
+        :Show plots;
+    else (no)
+        :Print "Timestamp data missing";
+    endif
+    stop
+}
+@enduml
