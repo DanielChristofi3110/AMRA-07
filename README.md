@@ -49,13 +49,40 @@ This project is a beginner-friendly robot that uses stepper motors, a microcontr
 ---
 
 ## Assembly Instructions
-1. Assemble the chassis base and attach the wheels.
-2. Mount the dc motors onto the chassis.
-3. Mount the encoders above the motors .
-4. Secure the pen holder in the center of the chassis.
-5. Place the microcontroller and motor drivers on the chassis or breadboard.
-6. Connect the power supply to the motor drivers and microcontroller.
-7. Wire the components as per the wiring diagram.
+1. Base Assembly:
+Use the HAITRONIC HRO238 2WD kit to form the robot's base.
+Attach the two DC motors to the motor slots on the base.
+Fix the castor wheel at the front as shown in the diagram.
+2. Power Supply:
+Mount the 18650 battery holder on the base.
+Ensure it can hold three 18650 rechargeable batteries.
+Connect the holder's output wires to the L298N motor driver for power distribution.
+3. Arduino Uno R3:
+Secure the Arduino Uno R3 in the designated slot on the base.
+Ensure it is oriented as shown, with the USB port facing outward for easy access.
+4. Motor Driver (L298N):
+Place the L298N motor driver near the motors.
+Connect the motor driver outputs to the DC motors.
+Attach the motor driver’s power input to the 18650 battery holder.
+5. MPU6050 (Accelerometer and Gyroscope):
+Mount the MPU6050 near the Arduino Uno.
+Connect the MPU6050's SDA and SCL pins to the corresponding pins on the Arduino.
+6. HC-05 Bluetooth Module:
+Position the HC-05 Bluetooth module as shown.
+Connect its RX and TX pins to the Arduino's TX and RX pins, respectively.
+Ensure the module's power pins are connected to the Arduino’s 3.3V and GND.
+7. Speed Sensors (LM393 Encoders):
+Install one LM393 speed sensor for each motor.
+Align the sensors with the motor wheels to measure speed accurately.
+Connect the sensor outputs to the Arduino's digital input pins.
+8. Wiring:
+Refer to the pin diagram for detailed connections:
+Arduino Uno pins are connected to the L298N motor driver, MPU6050, HC-05, and LM393 sensors.
+Power for all components is supplied through the 18650 battery holder.
+9. Final Check:
+Ensure all connections are secure and wires are neatly organized to avoid interference.
+Verify that the components match the locations and orientations in the diagram.
+
 
 ---
 
