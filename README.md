@@ -14,7 +14,7 @@ A simple robot designed to draw triangles of adjustable sizes. This project prov
 ## Table of Contents
 1. [Overview](#overview)
 2. [Parts List](#parts-list)
-3. [Assembly Instructions](#assembly-instructions)
+3. [Assembly Instructions](#assembly-instructions-for-the-triangle-drawing-robot)
 4. [Code](#code)
 5. [Contributing](#contributing)
 6. [License](#license)
@@ -48,7 +48,6 @@ Below is a diagram of the robot with all electronics labeled.
 
 
 ---
-
 ### Assembly Instructions for the Triangle-Drawing Robot
 
 Follow these steps to assemble your robot as per the provided diagram:
