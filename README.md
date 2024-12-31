@@ -21,8 +21,10 @@ A simple robot designed to draw triangles of adjustable sizes. This project prov
 
 ---
 
+
+![PreviewRender](images/all_render_1.png)
 ## Overview
-This project is a beginner-friendly robot that uses stepper motors, a microcontroller, and a pen to draw triangles. Below is a diagram of the robot with all electronics labeled.
+Below is a diagram of the robot with all electronics labeled.
 
 ![ROBOT Diagram 1](images/all.png)
 
