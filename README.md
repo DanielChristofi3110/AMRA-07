@@ -148,6 +148,10 @@ If you encounter issues, refer to the parts list and verify each component's con
 
 ## Code
 Upload the following Arduino sketch to the microcontroller to control the robot:
+![fc1](src/plantuml/out/main/main.png)
+![fc2](src/plantuml/out/motordriver/motordriver.png)
+![fc3](src/plantuml/out/pyanalize/pyanalize.png)
+
 
 
 
