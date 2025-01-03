@@ -116,8 +116,8 @@ Follow these steps to assemble your robot as per the provided diagram:
 
 ### Key Connections
 
-- **Stepper Motor 1**: Connect to Motor Driver 1 output pins.
-- **Stepper Motor 2**: Connect to Motor Driver 2 output pins.
+- **DC Motor 1**: Connect to Motor Driver 1 output pins.
+- **DC Motor 2**: Connect to Motor Driver 2 output pins.
 - **Motor Drivers**: Connect to the microcontroller as follows:
   - Step pin: Digital pin D2 (Motor Driver 1), D3 (Motor Driver 2).
   - Direction pin: Digital pin D4 (Motor Driver 1), D5 (Motor Driver 2).
