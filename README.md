@@ -1,3 +1,9 @@
+<video width="600" controls>
+  <source src="img/video.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+
 # Triangle Drawing Robot
 
 A simple robot designed to draw triangles of adjustable sizes. This project provides instructions on assembling the robot, connecting the electronics, and programming it to draw precise triangles. The robot uses a pen as the drawing tool and is controlled by a microcontroller.
