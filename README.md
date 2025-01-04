@@ -121,12 +121,12 @@ Follow these steps to assemble your robot as per the provided diagram:
 - **DC Motor 1**: Connect to Motor Driver 1 output pins.
 - **DC Motor 2**: Connect to Motor Driver 2 output pins.
 - **Motor Drivers**: Connect to the microcontroller as follows:
-   -ENA -> pin 9.
-   -ENB -> pin 10.
-   -IN1 -> pin 7.
-   -IN2 -> pin 6.
-   -IN3 -> pin 4.
-   -IN4 -> pin 5.
+   - ENA -> pin 9.
+   - ENB -> pin 10.
+   - IN1 -> pin 7.
+   - IN2 -> pin 6.
+   - IN3 -> pin 4.
+   - IN4 -> pin 5.
 - **MPU6050**:
   - SDA: Connect to A4 on Arduino.
   - SCL: Connect to A5 on Arduino.
