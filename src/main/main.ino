@@ -10,7 +10,7 @@ MPU6050 mpu;
 //way points
 
 int way_angle[3] = {0,120,120};
-float way_dist[3] = {500,500,500};// distance in mm
+float way_dist[3] = {800,800,800};// distance in mm
 float dm1=0,dm2=0;
 int c_way=0,finish_way=2;
 
@@ -19,6 +19,10 @@ int c_way=0,finish_way=2;
 // Timers
 unsigned long timer = 0;
 float timeStep = 0.01, TimeSinceStart = 0;
+const float time_to_stab = 1;
+float c_time_to_stab=0;
+const float time_to_stand = 0.2;
+float c_time_to_stand=time_to_stand;
 
 // Encoder variables
 volatile unsigned int encoderCount1 = 0; // Count pulses for encoder 1
@@ -35,13 +39,19 @@ double yaw = 0;
 double yawPIDOutput, rotationPIDOutput;
 
 // PID constants for yaw control
-double yawKp = 1, yawKi = 0, yawKd = 0; 
+double yawKp = 0.75, yawKi = 1.0, yawKd = 0.1; 
 
 // PID constants for rotation control
-double rotKp = 10, rotKi = 0.6, rotKd = 0.04; 
+//double rotKp =  0.75, rotKi = 1.0, rotKd =  0.1;
+//double rotKp =  2.42, rotKi = 2.2, rotKd =  0.66;
+double rotKp =  2.4, rotKi = 2.2, rotKd =  0.65;
+//double rotKp =  2.85, rotKi = 2.25, rotKd =  0.52;
+//double rotKp =  3.25, rotKi = 1.65, rotKd =  0.1;
+//double rotKp =  0.75, rotKi = 1.0, rotKd =  0.97;
 
 //motors
 int motorA=0,motorB=0;
+ int baseA=32, baseB=30;
 
 
 //  PID controllers
@@ -53,10 +63,18 @@ enum _state {
     forward,
     rotating,
     finish,
-    stand
+    stand,
+    cmd,
+    none
+
 };
 
-_state State = stand;
+_state State = cmd;
+
+//voltage
+const float max_v=1200;
+float cur_v=1200,cur_scale=max_v/cur_v;
+
 
 
 // Interrupt service routines for encoders
@@ -84,7 +102,7 @@ void setup()
 
   pinMode(13, OUTPUT);
 
-  for (int i = 0; i < 60; i++) {
+  for (int i = 0; i < 20; i++) {
     digitalWrite(13, HIGH);
     Serial.println(i);
     delay(500);
@@ -105,7 +123,12 @@ void setup()
 
   motorDriver.begin();
   yaw = way_angle[c_way]; // Initialize yaw
-
+  if(way_angle[c_way]>0){
+   c_time_to_stab=time_to_stab;
+  }else{
+    
+    c_time_to_stab=0;
+    }
   // Initialize encoders
   attachInterrupt(digitalPinToInterrupt(2), encoder1ISR, RISING);
   attachInterrupt(digitalPinToInterrupt(3), encoder2ISR, RISING);
@@ -131,7 +154,7 @@ void calculateRPM() {
 
 void printTotalDistance() {
   float totalDistance = (dm1 + dm2) / 2.0; // Average distance of both wheels
-  Serial.print("Total Distance Traveled (mm): ");
+  Serial.print("Distance_Traveled_(mm) = ");
   Serial.println(totalDistance);
 }
 
@@ -139,6 +162,49 @@ void resetDistance() {
   dm1 = 0;
   dm2 = 0;
 }
+
+void populateArrays(int way_angle[], float way_dist[], int size) {
+  // Ensure the size matches the expected size of the arrays (3 in this case)
+  if (size != 3) {
+    Serial.println("Error: Array size mismatch. Expected size: 3.");
+    return;
+  }
+
+  Serial.println("Enter 3 angle values followed by 3 distance values 1 volts:");
+
+  // Wait for user input for all values
+  while (Serial.available() < 7) {
+    // Wait until at least 7 values are entered (3 angles + 3 distances)
+  }
+
+  // Read angle values
+  for (int i = 0; i < 3; i++) {
+    way_angle[i] = Serial.parseInt();
+  }
+
+  // Read distance values
+  for (int i = 0; i < 3; i++) {
+    way_dist[i] = Serial.parseFloat();
+  }
+
+  cur_v=Serial.parseFloat();
+  if(cur_v<800){
+    cur_v=800;
+    }
+  cur_scale=max_v/cur_v;
+  baseA=(float)cur_scale*baseA;
+  baseB=(float)cur_scale*baseB;
+
+  
+
+  Serial.println("Arrays populated successfully vals.");
+
+   for (int i = 0; i < 3; i++) {
+    Serial.println(way_dist[i]);
+  }
+  Serial.println(cur_scale);
+}
+
 
 void loop()
 {
@@ -151,51 +217,85 @@ void loop()
 
   // Calculate Yaw
   yaw = yaw + norm.ZAxis * timeStep;
-  int acc = 5; // Tolerance around the target yaw
+  int acc = 1.0; // Tolerance around the target yaw
 
 
+  if(State==cmd){
 
+      populateArrays(way_angle,way_dist,3);
+      State=none;
 
   
-  if(State!=finish){
+  }else if(State==stand){
+
+      motorDriver.stopAll();
+      c_time_to_stand-=timeStep;
+      if(c_time_to_stand<=0){
+        State=none;
+        c_time_to_stand=time_to_stand;
+         Serial.println("end_Stand");
+        }
+      
+    
+    }else if(State!=finish){
 
 
-     Serial.print("State = ");
-     Serial.println(State);
-     Serial.print("Yaw = ");
-     Serial.println(yaw);
+   
+       Serial.print("[");
+       Serial.print(State);
+       Serial.print(",");
+       Serial.print(yaw);
+       Serial.print(",");
+       Serial.print((dm1 + dm2) / 2.0);
+       Serial.print(",");
+       Serial.print(way_angle[c_way]);
+       Serial.print(",");
+       Serial.print(motorA);
+       Serial.print(",");
+       Serial.print(motorB);
+       Serial.print(",");
+       Serial.print(yawPIDOutput);
+       Serial.print(",");
+       Serial.print(rotationPIDOutput);
+       Serial.println("]");
 
-     Serial.print("Way dist ");
-     Serial.println(way_dist[c_way]);
-     Serial.print("Way angle ");
-     Serial.println(way_angle[c_way]);
+     
+     
+  if ( ((abs(yaw) > acc)&&(State!=forward)) || (c_time_to_stab>0)) {
 
-     yawPID.Compute();
-  if (abs(yaw) > acc) {
-
+  
     State=rotating;
+
+    c_time_to_stab-=timeStep;
 
     rotationPID.Compute();
 
     // Serial.print("Rot pid");
     
 
-     motorA = -(float)(rotationPIDOutput)*1.2;
-     motorB = rotationPIDOutput; 
+     motorA = -(float)(rotationPIDOutput)*1.2*cur_scale;
+     motorB = (float)(rotationPIDOutput)*1.0*cur_scale; 
 
+     motorA = constrain(motorA,-baseA,baseA);
+     motorB = constrain(motorB,-baseB,baseB);
     
    // Serial.println(rotationPIDOutput);
     motorDriver.setSpeedBoth(motorA, motorB, 0);
  
-  } else {
+  } else if((c_time_to_stab<=0)|| (State==forward)) {
+     yawPID.Compute();
      State=forward;
+     
    
     
-     motorA = 35 -yawPIDOutput;
-     motorB = 30 + yawPIDOutput; 
+    // motorA = (32) -yawPIDOutput;
+    // motorB = (30) + yawPIDOutput; 
+
+     motorA = (float)(baseA) -yawPIDOutput*cur_scale;
+     motorB = (float)(baseB) + yawPIDOutput*cur_scale; 
     
   motorDriver.setSpeedBoth(motorA, motorB, 0);
- //  motorDriver.stopAll();
+  //motorDriver.stopAll();
    
    //way_dist[c_way]-= timeStep;
     if (way_dist[c_way] <= ((dm1 + dm2) / 2.0)) {
@@ -204,6 +304,8 @@ void loop()
          c_way++;
           
           yaw = way_angle[c_way]; // Reset yaw for another turn
+          c_time_to_stab=time_to_stab;
+          State=stand;
          
 
 
@@ -218,21 +320,21 @@ void loop()
 
   }
 
-  printTotalDistance();
-  // Wait to full timeStep period
+ 
+ 
   delay((timeStep * 1000) - (millis() - timer));
-  }else{
-    Serial.println("FIN");
-     motorDriver.stopAll();
+  }
 
-    digitalWrite(13, HIGH);
+    
+     //Serial.println("FIN");
+ 
+
+
+    
+    
   
-    delay(200);
-    digitalWrite(13, LOW);
-    delay(200);
-    
-    
-    }
+      
+      
   
  
 }
