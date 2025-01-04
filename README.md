@@ -121,8 +121,12 @@ Follow these steps to assemble your robot as per the provided diagram:
 - **DC Motor 1**: Connect to Motor Driver 1 output pins.
 - **DC Motor 2**: Connect to Motor Driver 2 output pins.
 - **Motor Drivers**: Connect to the microcontroller as follows:
-  - Step pin: Digital pin D2 (Motor Driver 1), D3 (Motor Driver 2).
-  - Direction pin: Digital pin D4 (Motor Driver 1), D5 (Motor Driver 2).
+   -ENA -> pin 9.
+   -ENB -> pin 10.
+   -IN1 -> pin 7.
+   -IN2 -> pin 6.
+   -IN3 -> pin 4.
+   -IN4 -> pin 5.
 - **MPU6050**:
   - SDA: Connect to A4 on Arduino.
   - SCL: Connect to A5 on Arduino.
@@ -130,8 +134,8 @@ Follow these steps to assemble your robot as per the provided diagram:
   - RX: Connect to D10 on Arduino.
   - TX: Connect to D11 on Arduino.
 - **Speed Sensors**:
-  - Sensor 1 output: Connect to D6 on Arduino.
-  - Sensor 2 output: Connect to D7 on Arduino.
+  - Sensor 1 output: Connect to pin 1 on Arduino.
+  - Sensor 2 output: Connect to pin 0 on Arduino.
 - **Power Supply**: Connect to motor driver VCC and GND.
 
 ---
@@ -149,7 +153,7 @@ If you encounter issues, refer to the parts list and verify each component's con
 
 
 ## Code
-Upload the following Arduino sketch to the microcontroller to control the robot:
+flow charts of the code:
 ![fc1](src/plantuml/out/main/main.png)
 ![fc2](src/plantuml/out/motordriver/motordriver.png)
 ![fc3](src/plantuml/out/pyanalize/pyanalize.png)
