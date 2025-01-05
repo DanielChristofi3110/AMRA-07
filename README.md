@@ -153,7 +153,8 @@ If you encounter issues, refer to the parts list and verify each component's con
 
 
 ## Code
-flow charts of the code:
+Code located in src/main/
+Flow charts of the code:
 ![fc1](src/plantuml/out/main/main.png)
 ![fc2](src/plantuml/out/motordriver/motordriver.png)
 ![fc3](src/plantuml/out/pyanalize/pyanalize.png)
