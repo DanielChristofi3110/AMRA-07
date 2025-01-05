@@ -164,7 +164,10 @@ flow charts of the code:
 ---
 
 ## Contributing
-Contributions are welcome! Feel free to open an issue or submit a pull request.
+- **Charalampos Koukos** - *Hardware* - [Xaristrike](https://github.com/Xaristrike)
+- **Daniil Christofi** - *Manager* - [DanielChristofi3110](https://github.com/DanielChristofi3110)
+- **Christos Toumparis** - *Software Developer* - [ChrisToumparis](https://github.com/ChrisToumparis)
+- **Spiros Tsochataridis** - *Software Developer* - [spirostt](https://github.com/spirostt)
 
 ---
 
@@ -175,8 +178,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 
 
-![ROBOT](images/all.png)
-![ROBOT](images/all_diag.png)
-![BP1](images/bp1.png)
-![PERT](images/test.png)
-![DIAG](images/diag.png)
+
